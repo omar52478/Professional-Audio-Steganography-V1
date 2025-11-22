@@ -11,7 +11,7 @@
 
 ## 📸 Screenshot
 
-![ProStego GUI](gui-screenshot.png)
+![ProStego GUI](gui-v2.0.png)
 
 *A modern desktop application with an intuitive interface for hiding and extracting data from audio files.*
 
