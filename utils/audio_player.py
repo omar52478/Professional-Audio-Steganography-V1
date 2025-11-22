@@ -1,60 +1,47 @@
 # utils/audio_player.py
-import simpleaudio as sa
-import threading
-import numpy as np
+import pygame
 import os
-import io
 
+# تهيئة المحرك الصوتي بصمت
 try:
-    from pydub import AudioSegment
-    PYDUB_AVAILABLE = True
-except ImportError:
-    PYDUB_AVAILABLE = False
+    pygame.mixer.init()
+except:
+    pass
 
+class AudioController:
+    def __init__(self):
+        self.current_file = None
+        self.is_paused = False
+        self.duration = 0
 
-current_playback = None
+    def load(self, path):
+        self.current_file = path
+        try:
+            pygame.mixer.music.load(path)
+            self.is_paused = False
+        except Exception as e:
+            print(f"Audio Load Error: {e}")
 
-def play_audio(audio_path, progress_callback):
-    global current_playback
-    stop_audio()
-    
-    try:
-        if not PYDUB_AVAILABLE:
-            raise ImportError("pydub is required to play audio.")
+    def play(self):
+        if self.current_file:
+            if self.is_paused:
+                pygame.mixer.music.unpause()
+            else:
+                pygame.mixer.music.play()
+            self.is_paused = False
 
-        # --- FIX: Use pydub to load any audio format and get raw data ---
-        ext = os.path.splitext(audio_path)[1].lower()
-        if ext == '.wav':
-            audio = AudioSegment.from_wav(audio_path)
-        elif ext == '.mp3':
-            audio = AudioSegment.from_mp3(audio_path)
-        else:
-            # Fallback for other potential formats if ffmpeg supports them
-            audio = AudioSegment.from_file(audio_path)
+    def pause(self):
+        pygame.mixer.music.pause()
+        self.is_paused = True
 
-        # Get raw audio data compatible with simpleaudio
-        data = audio.raw_data
-        samplerate = audio.frame_rate
-        num_channels = audio.channels
-        bytes_per_sample = audio.sample_width
+    def stop(self):
+        pygame.mixer.music.stop()
+        self.is_paused = False
 
-        def player_thread():
-            global current_playback
-            progress_callback(f"▶️ Playing {os.path.basename(audio_path)}...")
-            current_playback = sa.play_buffer(data, num_channels, bytes_per_sample, samplerate)
-            current_playback.wait_done()
-            progress_callback("⏹️ Playback finished.")
-            current_playback = None
+    def get_pos(self):
+        if pygame.mixer.music.get_busy() or self.is_paused:
+            # pygame returns milliseconds, convert to seconds
+            return pygame.mixer.music.get_pos() / 1000.0
+        return 0
 
-        threading.Thread(target=player_thread, daemon=True).start()
-
-    except Exception as e:
-        progress_callback(f"Error playing audio: {e}")
-
-def stop_audio():
-    global current_playback
-    if current_playback and current_playback.is_playing():
-        sa.stop_all()
-        current_playback = None
-        return True
-    return False
+controller = AudioController()
