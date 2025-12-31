@@ -276,7 +276,7 @@ Contributions are welcome\! To contribute:
 
 ## 👨‍💻 Author
 
-**Omar Ahmed** (@omar52478)
+**Omar Kareem** (@omar52478)
 
   - **GitHub**: [omar52478](https://github.com/omar52478)
   - **Project Repository**: [Professional-Audio-Steganography](https://github.com/omar52478/Professional-Audio-Steganography)
